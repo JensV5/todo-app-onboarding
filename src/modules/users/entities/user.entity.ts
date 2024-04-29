@@ -13,6 +13,7 @@ import {
 import { Client } from '../../auth/entities/client.entity.js'
 import { RefreshToken } from '../../auth/entities/refreshtoken.entity.js'
 import { Role } from '../../roles/entities/role.entity.js'
+import { Todo } from '../../todo/entities/todo.entity.js'
 
 @Entity()
 export class User {
@@ -51,4 +52,7 @@ export class User {
 
   @OneToMany(() => RefreshToken, token => token.user)
   tokens?: Array<Relation<RefreshToken>>
+
+  @OneToMany(() => Todo, todo => todo.user)
+  todos?: Array<Relation<Todo>>
 }

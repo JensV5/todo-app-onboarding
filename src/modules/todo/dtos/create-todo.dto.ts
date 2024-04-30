@@ -5,6 +5,10 @@ import { IsNullable } from "../../../utils/validators/is-nullable.validator.js"
 export class CreateTodoDto {
   @ApiProperty()
   @IsNotEmpty()
+  userUuid: string
+
+  @ApiProperty()
+  @IsNotEmpty()
   title: string
 
   @ApiProperty()

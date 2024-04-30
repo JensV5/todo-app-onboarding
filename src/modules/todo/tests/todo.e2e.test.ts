@@ -14,6 +14,7 @@ import { Role } from '../../roles/entities/role.entity.js'
 import { SetupUserType } from '../../users/tests/setup-user.type.js'
 import { RoleSeeder } from '../../roles/tests/role.seeder.js'
 import { RoleSeederModule } from '../../roles/tests/role-seeder.module.js'
+import { Todo } from '../entities/todo.entity.js'
 
 describe('Todo tests', async () => {
   let app: INestApplication
@@ -26,6 +27,8 @@ describe('Todo tests', async () => {
 
   let readonlyUser: SetupUserType
   let adminUser: SetupUserType
+
+  let todo: Todo
 
   before(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -69,6 +72,8 @@ describe('Todo tests', async () => {
       email: roleSeeder.createRandomEmail()
     })
 
+    todo = await todoSeeder.createOneTodo(adminUser.user.uuid)
+
     await app.init()
   })
 
@@ -98,13 +103,30 @@ describe('Todo tests', async () => {
       expect(response.status).toBe(400)
     })
 
-    it('should return 200', async () => {
-      const dto = todoSeeder.generateCreateTodoDto()
+    it('should return 201', async () => {
+      const dto = todoSeeder.generateCreateTodoDto(adminUser.user.uuid)
 
       const response = await request(app.getHttpServer())
         .post('/todos')
         .set('Authorization', `Bearer ${adminUser.token}`)
         .send(dto)
+
+      expect(response.status).toBe(201)
+    })
+  })
+
+  describe('Get todo', () => {
+    it('should return 401 when not authenticated', async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/todos/${todo.uuid}`)
+
+      expect(response.status).toBe(401)
+    })
+
+    it('should return 200', async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/todos/${todo.uuid}`)
+        .set('Authorization', `Bearer ${adminUser.token}`)
 
       expect(response.status).toBe(200)
     })
@@ -113,5 +135,4 @@ describe('Todo tests', async () => {
   after(async () => {
     await app.close()
   })
-
 })

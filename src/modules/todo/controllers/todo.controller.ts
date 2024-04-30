@@ -6,10 +6,16 @@ import { UserTransformerType } from '../../users/transformers/user.transformer.j
 import { KnownError } from '../../../utils/Exceptions/errors.js'
 import { UpdateTodoDto } from '../dtos/update-todo.dto.js'
 import { UpdateCompletedValueTodoDto } from '../dtos/update-completed-value-todo.dto.js'
+import { TodoService } from '../services/todo.service.js'
+import { Todo } from '../entities/todo.entity.js'
 
 @ApiTags('Todo')
 @Controller('todos')
 export class TodoController {
+  constructor(
+    private readonly todoService: TodoService
+  ) {}
+
   @Post()
   @ApiResponse({
     status: 201,
@@ -18,8 +24,8 @@ export class TodoController {
   })
   async createTodo (
     @Body() createTodoDto: CreateTodoDto,
-  ): Promise<void> {
-    throw new KnownError('not_found')
+  ): Promise<Todo> {
+    return await this.todoService.createTodo(createTodoDto)
   }
 
   @Get(':todo')
@@ -30,8 +36,10 @@ export class TodoController {
   })
   async getTodo (
     @Param('todo', ParseUUIDPipe) todoUuid: string
-  ): Promise<void> {
-    throw new KnownError('not_found')
+  ): Promise<Todo> {
+    console.log('getting todo with')
+    console.log(todoUuid)
+    return await this.todoService.getTodo(todoUuid)
   }
 
   @Get()
@@ -40,8 +48,8 @@ export class TodoController {
     description: 'The todos have been successfully received.',
     type: TodoTransformerType
   })
-  async getTodos(): Promise<void> {
-    throw new KnownError('not_found')
+  async getTodos(): Promise<Todo[]> {
+    return await this.todoService.getTodos()
   }
 
   @Post('/:todo')
@@ -53,8 +61,8 @@ export class TodoController {
   async updateTodo(
     @Param('todo', ParseUUIDPipe) todoUuid: string,
     @Body() updateTodoDto: UpdateTodoDto,
-  ): Promise<void> {
-    throw new KnownError('not_found')
+  ): Promise<Todo> {
+    return await this.todoService.updateTodo(todoUuid, updateTodoDto)
   }
 
   @Delete('/:todo')
@@ -65,7 +73,7 @@ export class TodoController {
   async deleteTodo(
     @Param('todo', ParseUUIDPipe) todoUuid: string
   ): Promise<void> {
-    throw new KnownError('not_found')
+    return await this.todoService.deleteTodo(todoUuid)
   }
 
   @Post('/:todo/complete')
@@ -76,8 +84,8 @@ export class TodoController {
   async completeTodo(
     @Param('todo', ParseUUIDPipe) todoUuid: string,
     @Body() updateCompletedValueTodoDto: UpdateCompletedValueTodoDto,
-  ): Promise<void> {
-    throw new KnownError('not_found')
+  ): Promise<Todo> {
+    return await this.todoService.updateTodoCompleted(todoUuid, updateCompletedValueTodoDto)
   }
 
   @Post('/:todo/uncomplete')
@@ -88,7 +96,7 @@ export class TodoController {
   async uncompleteTodo(
     @Param('todo', ParseUUIDPipe) todoUuid: string,
     @Body() updateCompletedValueTodoDto: UpdateCompletedValueTodoDto,
-  ): Promise<void> {
-    throw new KnownError('not_found')
+  ): Promise<Todo> {
+    return await this.todoService.updateTodoCompleted(todoUuid, updateCompletedValueTodoDto)
   }
 }
